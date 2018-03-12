@@ -52,7 +52,7 @@ export class DualListBoxComponent implements OnInit, ControlValueAccessor {
     // text displayed over the selected items list box
     @Input() selectedText = 'Selected items';
     // set placeholder text in available items list box
-    @Input() availableFilterPlaceholder= 'Filter...';
+    @Input() availableFilterPlaceholder = 'Filter...';
     // set placeholder text in selected items list box
     @Input() selectedFilterPlaceholder = 'Filter...';
 
@@ -118,6 +118,7 @@ export class DualListBoxComponent implements OnInit, ControlValueAccessor {
         }
         this.selectedItems = [...this.selectedItems, ...this.availableItems];
         this.availableItems = [];
+        this.writeValue(this.getValues());
         this.onItemsMoved.emit({
             available: this.availableItems,
             selected: this.selectedItems,
@@ -126,7 +127,6 @@ export class DualListBoxComponent implements OnInit, ControlValueAccessor {
             to: 'selected'
         });
         this.availableListBoxControl.setValue([]);
-        this.writeValue(this.getValues());
     }
 
     /**
@@ -139,6 +139,7 @@ export class DualListBoxComponent implements OnInit, ControlValueAccessor {
         }
         this.availableItems = [...this.availableItems, ...this.selectedItems];
         this.selectedItems = [];
+        this.writeValue([]);
         this.onItemsMoved.emit({
             available: this.availableItems,
             selected: this.selectedItems,
@@ -147,7 +148,6 @@ export class DualListBoxComponent implements OnInit, ControlValueAccessor {
             to: 'available'
         });
         this.selectedListBoxControl.setValue([]);
-        this.writeValue([]);
     }
 
     /**
@@ -157,12 +157,13 @@ export class DualListBoxComponent implements OnInit, ControlValueAccessor {
 
         // first move items to selected
         this.selectedItems = [...this.selectedItems,
-            ...intersectionwith(this.availableItems, this.availableListBoxControl.value,
-                (item: IListBoxItem, value: string) => item.value === value)];
+        ...intersectionwith(this.availableItems, this.availableListBoxControl.value,
+            (item: IListBoxItem, value: string) => item.value === value)];
         // now filter available items to not include marked values
         this.availableItems = [...differenceWith(this.availableItems, this.availableListBoxControl.value,
             (item: IListBoxItem, value: string) => item.value === value)];
         // clear marked available items and emit event
+        this.writeValue(this.getValues());
         this.onItemsMoved.emit({
             available: this.availableItems,
             selected: this.selectedItems,
@@ -172,7 +173,6 @@ export class DualListBoxComponent implements OnInit, ControlValueAccessor {
         });
         this.availableListBoxControl.setValue([]);
         this.availableSearchInputControl.setValue('');
-        this.writeValue(this.getValues());
     }
 
     /**
@@ -182,12 +182,13 @@ export class DualListBoxComponent implements OnInit, ControlValueAccessor {
 
         // first move items to available
         this.availableItems = [...this.availableItems,
-            ...intersectionwith(this.selectedItems, this.selectedListBoxControl.value,
-                (item: IListBoxItem, value: string) => item.value === value)];
+        ...intersectionwith(this.selectedItems, this.selectedListBoxControl.value,
+            (item: IListBoxItem, value: string) => item.value === value)];
         // now filter available items to not include marked values
         this.selectedItems = [...differenceWith(this.selectedItems, this.selectedListBoxControl.value,
             (item: IListBoxItem, value: string) => item.value === value)];
         // clear marked available items and emit event
+        this.writeValue(this.getValues());
         this.onItemsMoved.emit({
             available: this.availableItems,
             selected: this.selectedItems,
@@ -197,7 +198,6 @@ export class DualListBoxComponent implements OnInit, ControlValueAccessor {
         });
         this.selectedListBoxControl.setValue([]);
         this.selectedSearchInputControl.setValue('');
-        this.writeValue(this.getValues());
     }
 
     /**
@@ -208,6 +208,7 @@ export class DualListBoxComponent implements OnInit, ControlValueAccessor {
 
         this.availableItems = this.availableItems.filter((listItem: IListBoxItem) => listItem.value !== item.value);
         this.selectedItems = [...this.selectedItems, item];
+        this.writeValue(this.getValues());
         this.onItemsMoved.emit({
             available: this.availableItems,
             selected: this.selectedItems,
@@ -217,7 +218,6 @@ export class DualListBoxComponent implements OnInit, ControlValueAccessor {
         });
         this.availableSearchInputControl.setValue('');
         this.availableListBoxControl.setValue([]);
-        this.writeValue(this.getValues());
     }
 
     /**
@@ -228,6 +228,7 @@ export class DualListBoxComponent implements OnInit, ControlValueAccessor {
 
         this.selectedItems = this.selectedItems.filter((listItem: IListBoxItem) => listItem.value !== item.value);
         this.availableItems = [...this.availableItems, item];
+        this.writeValue(this.getValues());
         this.onItemsMoved.emit({
             available: this.availableItems,
             selected: this.selectedItems,
@@ -237,7 +238,6 @@ export class DualListBoxComponent implements OnInit, ControlValueAccessor {
         });
         this.selectedSearchInputControl.setValue('');
         this.selectedListBoxControl.setValue([]);
-        this.writeValue(this.getValues());
     }
 
     /**
@@ -254,7 +254,7 @@ export class DualListBoxComponent implements OnInit, ControlValueAccessor {
     writeValue(value: any): void {
         if (this.selectedItems && value && value.length > 0) {
             this.selectedItems = [...this.selectedItems,
-                ...intersectionwith(this.availableItems, value, (item: IListBoxItem, val: string) => item.value === val)];
+            ...intersectionwith(this.availableItems, value, (item: IListBoxItem, val: string) => item.value === val)];
             this.availableItems = [...differenceWith(this.availableItems, value,
                 (item: IListBoxItem, val: string) => item.value === val)];
         }
