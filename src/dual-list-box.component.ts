@@ -3,6 +3,7 @@ import { FormGroup, FormBuilder, FormControl, NG_VALUE_ACCESSOR, ControlValueAcc
 import 'rxjs/add/operator/debounceTime';
 import 'rxjs/add/operator/distinctUntilChanged';
 import 'rxjs/add/operator/map';
+import 'rxjs/operators/find';
 const intersectionwith = require('lodash.intersectionwith');
 const differenceWith = require('lodash.differencewith');
 
@@ -20,6 +21,10 @@ import { IItemsMovedEvent, IListBoxItem } from './models';
 })
 export class DualListBoxComponent implements OnInit, ControlValueAccessor {
 
+    // field to use for value of option
+    @Input() valueField = 'id';
+    // field to use for displaying option text
+    @Input() textField = 'name';
     // array of items to display in left box
     @Input() set data(items: Array<{}>) {
         this.availableItems = [...(items || []).map((item: {}, index: number) => ({
@@ -37,10 +42,6 @@ export class DualListBoxComponent implements OnInit, ControlValueAccessor {
         this.searchTermSelected = searchTerm;
         this.selectedSearchInputControl.setValue(searchTerm);
     };
-    // field to use for value of option
-    @Input() valueField = 'id';
-    // field to use for displaying option text
-    @Input() textField = 'name';
     // text to display as title above component
     @Input() title: string;
     // time to debounce search output in ms
