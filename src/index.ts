@@ -5,7 +5,6 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { DualListBoxComponent } from './dual-list-box.component';
 import { ArraySortPipe, ArrayFilterPipe } from './array.pipes';
 import 'rxjs/operators/find';
-import 'codelyzer/templateCyclomaticComplexityRule';
 
 @NgModule({
   imports: [
