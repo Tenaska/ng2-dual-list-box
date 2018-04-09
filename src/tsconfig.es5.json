@@ -1,12 +1,25 @@
 {
   "compilerOptions": {
-    "outDir": "../out-tsc/app",
-    "baseUrl": "./",
+    "outDir": "../build",
+    "baseUrl": ".",
     "module": "es2015",
-    "types": []
+    "target": "es5",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "types": [
+      "node"
+    ],
+    "lib": [
+      "es5", "es6", "dom"
+    ],
+    "rootDir": "../",
+    "moduleResolution": "node"
   },
-  "files": [
-    "test.ts",
-    "**/*.spec.ts"
+  "exclude": [
+    "../node_modules",
+    "../**/*.spec.ts"
+  ],
+  "include": [
+    "../src/*.ts"
   ]
 }

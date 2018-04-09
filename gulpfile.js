@@ -11,7 +11,7 @@ var gulp = require('gulp'),
 const rootFolder = path.join(__dirname);
 const srcFolder = path.join(rootFolder, 'src');
 const tmpFolder = path.join(rootFolder, '.tmp');
-const buildFolder = path.join(rootFolder, 'build');
+const buildFolder = path.join(rootFolder, 'build', 'src');
 const distFolder = path.join(rootFolder, 'dist');
 
 /**
@@ -46,16 +46,14 @@ gulp.task('inline-resources', function () {
  *    compiled modules to the /build folder.
  */
 gulp.task('ngc', function () {
-  return ngc({
-    project: `${tmpFolder}/tsconfig.es5.json`
-  })
-    .then((exitCode) => {
-      if (exitCode === 1) {
-        // This error is caught in the 'compile' task by the runSequence method callback
-        // so that when ngc fails to compile, the whole compile process stops running
-        throw new Error('ngc compilation failed');
-      }
-    });
+  return ngc(['-p', `${tmpFolder}/tsconfig.es5.json`], (error) => {
+    if (error) {
+      console.error(error);
+      // This error is caught in the 'compile' task by the runSequence method callback
+      // so that when ngc fails to compile, the whole compile process stops running
+      throw new Error('ngc compilation failed');
+    }
+  });
 });
 
 /**
@@ -69,13 +67,14 @@ gulp.task('rollup:fesm', function () {
 
       // Bundle's entry point
       // See https://github.com/rollup/rollup/wiki/JavaScript-API#entry
-      entry: `${buildFolder}/index.js`,
+      input: `${buildFolder}/index.js`,
 
       // A list of IDs of modules that should remain external to the bundle
       // See https://github.com/rollup/rollup/wiki/JavaScript-API#external
       external: [
         '@angular/core',
-        '@angular/common'
+        '@angular/common',
+        '@angular/forms'
       ],
 
       // Format of generated bundle
@@ -96,13 +95,14 @@ gulp.task('rollup:umd', function () {
 
       // Bundle's entry point
       // See https://github.com/rollup/rollup/wiki/JavaScript-API#entry
-      entry: `${buildFolder}/index.js`,
+      input: `${buildFolder}/index.js`,
 
       // A list of IDs of modules that should remain external to the bundle
       // See https://github.com/rollup/rollup/wiki/JavaScript-API#external
       external: [
         '@angular/core',
-        '@angular/common'
+        '@angular/common',
+        '@angular/forms'
       ],
 
       // Format of generated bundle
@@ -116,7 +116,7 @@ gulp.task('rollup:umd', function () {
       // The name to use for the module for UMD/IIFE bundles
       // (required for bundles with exports)
       // See https://github.com/rollup/rollup/wiki/JavaScript-API#modulename
-      moduleName: 'ng2-dual-list-box',
+      name: 'ng2-dual-list-box',
 
       // See https://github.com/rollup/rollup/wiki/JavaScript-API#globals
       globals: {
@@ -139,10 +139,10 @@ gulp.task('copy:build', function () {
 });
 
 /**
- * 8. Copy package.json from /src to /dist
+ * 8. Copy package.json from ./ to /dist
  */
 gulp.task('copy:manifest', function () {
-  return gulp.src([`${srcFolder}/package.json`])
+  return gulp.src([`${rootFolder}/package.json`])
     .pipe(gulp.dest(distFolder));
 });
 
@@ -150,7 +150,7 @@ gulp.task('copy:manifest', function () {
  * 9. Copy README.md from / to /dist
  */
 gulp.task('copy:readme', function () {
-  return gulp.src([path.join(rootFolder, 'README.MD')])
+  return gulp.src([path.join(rootFolder, 'README.md')])
     .pipe(gulp.dest(distFolder));
 });
 
