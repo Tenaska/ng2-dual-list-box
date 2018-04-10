@@ -106,6 +106,24 @@ To lint all `*.ts` files:
 $ npm run lint
 ```
 
+## Deployment
+
+An overkill way to package this up is:
+
+```bash
+$ npm run build
+$ gulp copy:source
+$ gulp inline-resources
+$ gulp ngc
+$ gulp rollup:fesm
+$ gulp rollup:umd
+$ gulp copy:build
+$ cd dist/
+$ npm publish
+```
+
+Someone please tell me that all of these are not required. However, `npm run build` is never sufficient.
+
 ## License
 
 MIT © [Eldar Granulo](mailto:eldar32@gmail.com)
