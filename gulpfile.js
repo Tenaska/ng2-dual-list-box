@@ -135,7 +135,8 @@ gulp.task('rollup:umd', function () {
  */
 gulp.task('copy:build', function () {
   return gulp.src([`${buildFolder}/**/*`, `!${buildFolder}/**/*.js`])
-    .pipe(gulp.dest(distFolder));
+    .pipe(gulp.dest(`${distFolder}/build`))
+    .pipe(gulp.dest(`${distFolder}/src`));
 });
 
 /**

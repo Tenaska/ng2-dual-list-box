@@ -6,6 +6,8 @@
     "target": "es5",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    "stripInternal": true,
+    "declaration": true,
     "types": [
       "node"
     ],
