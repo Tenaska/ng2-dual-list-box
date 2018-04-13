@@ -335,6 +335,18 @@ export class DualListBoxComponent implements OnInit, ControlValueAccessor {
     registerOnTouched(fn: () => {}): void {
         this._onTouched = fn;
     }
+
+    setDisabledState(isDisabled: boolean) {
+        if (!isDisabled) {
+            this.availableListBoxControl.enable();
+            this.selectedListBoxControl.enable();
+            this.disableDualListBox = isDisabled;
+        } else {
+            this.availableListBoxControl.disable();
+            this.selectedListBoxControl.disable();
+            this.disableDualListBox = isDisabled;
+        }
+    }
     /* Methods from ControlValueAccessor interface, required for ngModel and formControlName - end */
 
     /**
