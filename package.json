@@ -1,6 +1,6 @@
 {
-  "name": "ng2-dual-list-box",
-  "version": "1.2.2",
+  "name": "@tenaska/ng2-dual-list-box",
+  "version": "1.3.1",
   "scripts": {
     "build": "npm run packagr",
     "build:watch": "gulp",
@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/matsura/ng2-dual-list-box"
+    "url": "https://github.com/tenaska/ng2-dual-list-box"
   },
   "author": {
     "name": "Eldar Granulo",
@@ -26,7 +26,7 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/matsura/ng2-dual-list-box/issues"
+    "url": "https://github.com/tenaska/ng2-dual-list-box/issues"
   },
   "devDependencies": {
     "@angular/common": "^5.2.7",

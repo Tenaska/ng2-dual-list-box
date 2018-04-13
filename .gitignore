@@ -25,6 +25,7 @@ src/**/*.js.map
 # Windows
 Thumbs.db
 Desktop.ini
+.tmp
 
 # Mac
 .DS_Store
@@ -53,3 +54,6 @@ base.spec.d.ts
 # Ng pkg
 .ng_pkg_build/*
 build/*
+
+# NPM
+src/*.npmrc

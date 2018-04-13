@@ -7,7 +7,7 @@ import 'rxjs/operators/find';
 const intersectionwith = require('lodash.intersectionwith');
 const differenceWith = require('lodash.differencewith');
 
-import { IItemsMovedEvent, IListBoxItem } from './models';
+import { IItemsMovedEvent, IListBoxItem, IItemReorderEvent } from './models';
 
 @Component({
     selector: 'ng2-dual-list-box',
@@ -56,6 +56,22 @@ export class DualListBoxComponent implements OnInit, ControlValueAccessor {
     @Input() availableFilterPlaceholder = 'Filter...';
     // set placeholder text in selected items list box
     @Input() selectedFilterPlaceholder = 'Filter...';
+    // set if dual list box is disabled
+    @Input() set disabled(disable: boolean) {
+        if (!disable) {
+            this.availableListBoxControl.enable();
+            this.selectedListBoxControl.enable();
+            this.disableDualListBox = disable;
+        } else {
+            this.availableListBoxControl.disable();
+            this.selectedListBoxControl.disable();
+            this.disableDualListBox = disable;
+        }
+    }
+    // set sorting
+    @Input() sorting: String[] = [];
+    // show/hide button to order selected items;
+    @Input() ordering = false;
 
     // event called when item or items from available items(left box) is selected
     @Output() onAvailableItemSelected: EventEmitter<{} | Array<{}>> = new EventEmitter<{} | Array<{}>>();
@@ -63,6 +79,8 @@ export class DualListBoxComponent implements OnInit, ControlValueAccessor {
     @Output() onSelectedItemsSelected: EventEmitter<{} | Array<{}>> = new EventEmitter<{} | Array<{}>>();
     // event called when items are moved between boxes, returns state of both boxes and item moved
     @Output() onItemsMoved: EventEmitter<IItemsMovedEvent> = new EventEmitter<IItemsMovedEvent>();
+    // event called when items are reordered in the select box
+    @Output() onItemsReorder: EventEmitter<IItemReorderEvent> = new EventEmitter<IItemReorderEvent>();
 
     // private variables to manage class
     searchTermAvailable = '';
@@ -74,7 +92,7 @@ export class DualListBoxComponent implements OnInit, ControlValueAccessor {
     selectedListBoxControl: FormControl = new FormControl();
     availableSearchInputControl: FormControl = new FormControl();
     selectedSearchInputControl: FormControl = new FormControl();
-
+    disableDualListBox = false;
     // control value accessors
     _onChange = (_: any) => { };
     _onTouched = () => { };
@@ -206,19 +224,20 @@ export class DualListBoxComponent implements OnInit, ControlValueAccessor {
      * @param item
      */
     moveAvailableItemToSelected(item: IListBoxItem): void {
-
-        this.availableItems = this.availableItems.filter((listItem: IListBoxItem) => listItem.value !== item.value);
-        this.selectedItems = [...this.selectedItems, item];
-        this.writeValue(this.getValues());
-        this.onItemsMoved.emit({
-            available: this.availableItems,
-            selected: this.selectedItems,
-            movedItems: [item.value],
-            from: 'available',
-            to: 'selected'
-        });
-        this.availableSearchInputControl.setValue('');
-        this.availableListBoxControl.setValue([]);
+        if (!this.disableDualListBox) {
+            this.availableItems = this.availableItems.filter((listItem: IListBoxItem) => listItem.value !== item.value);
+            this.selectedItems = [...this.selectedItems, item];
+            this.writeValue(this.getValues());
+            this.onItemsMoved.emit({
+                available: this.availableItems,
+                selected: this.selectedItems,
+                movedItems: [item.value],
+                from: 'available',
+                to: 'selected'
+            });
+            this.availableSearchInputControl.setValue('');
+            this.availableListBoxControl.setValue([]);
+        }
     }
 
     /**
@@ -226,19 +245,52 @@ export class DualListBoxComponent implements OnInit, ControlValueAccessor {
      * @param item
      */
     moveSelectedItemToAvailable(item: IListBoxItem): void {
+        if (!this.disableDualListBox) {
+            this.selectedItems = this.selectedItems.filter((listItem: IListBoxItem) => listItem.value !== item.value);
+            this.availableItems = [...this.availableItems, item];
+            this.writeValue(this.getValues());
+            this.onItemsMoved.emit({
+                available: this.availableItems,
+                selected: this.selectedItems,
+                movedItems: [item.value],
+                from: 'selected',
+                to: 'available'
+            });
+            this.selectedSearchInputControl.setValue('');
+            this.selectedListBoxControl.setValue([]);
+        }
+    }
 
-        this.selectedItems = this.selectedItems.filter((listItem: IListBoxItem) => listItem.value !== item.value);
-        this.availableItems = [...this.availableItems, item];
+    reorderMarkedItems(direction: string) {
+        let markedItems: any[] = this.selectedListBoxControl.value
+
+        if (direction === 'up' && markedItems) {
+            for (let i = 0; i < this.selectedItems.length; i++) {
+                let itemFound = markedItems.filter((x) => x === this.selectedItems[i].value).length > 0;
+                if (markedItems && itemFound && i !== 0) {
+                    let temp = this.selectedItems[i - 1];
+                    this.selectedItems[i - 1] = this.selectedItems[i];
+                    this.selectedItems[i] = temp;
+                }
+            }
+        } else if (direction === 'down' && markedItems) {
+            for (let i = this.selectedItems.length - 1; i >= 0; i--) {
+                let itemFound = markedItems.filter((x) => x === this.selectedItems[i].value).length > 0;
+                if (markedItems && itemFound && i !== (this.selectedItems.length - 1)) {
+                    let temp = this.selectedItems[i + 1];
+                    this.selectedItems[i + 1] = this.selectedItems[i];
+                    this.selectedItems[i] = temp;
+                }
+            }
+        }
         this.writeValue(this.getValues());
-        this.onItemsMoved.emit({
-            available: this.availableItems,
+        this.onItemsReorder.emit({
+            reorderedItems: markedItems,
             selected: this.selectedItems,
-            movedItems: [item.value],
-            from: 'selected',
-            to: 'available'
+            direction: direction
         });
         this.selectedSearchInputControl.setValue('');
-        this.selectedListBoxControl.setValue([]);
+        this.selectedListBoxControl.setValue(markedItems);
     }
 
     /**
@@ -256,6 +308,20 @@ export class DualListBoxComponent implements OnInit, ControlValueAccessor {
         if (this.selectedItems && value && value.length > 0) {
             this.selectedItems = [...this.selectedItems,
             ...intersectionwith(this.availableItems, value, (item: IListBoxItem, val: string) => item.value === val)];
+            const result = [];
+            value.forEach((key) => {
+                let found = false;
+                this.selectedItems = this.selectedItems.filter((item) => {
+                    if (!found && item.value === key) {
+                        result.push(item);
+                        found = true;
+                        return false;
+                    } else {
+                        return true;
+                    }
+                });
+            });
+            this.selectedItems = result;
             this.availableItems = [...differenceWith(this.availableItems, value,
                 (item: IListBoxItem, val: string) => item.value === val)];
         }

@@ -16,3 +16,12 @@ export interface IItemsMovedEvent {
     from: 'selected' | 'available';
     to: 'selected' | 'available';
 }
+/**
+ * Helper interface to emit event when
+ * items are reordered in the selected box
+ */
+export interface IItemReorderEvent {
+    reorderedItems: Array<{}>;
+    selected: Array<{}>;
+    direction: string;
+}

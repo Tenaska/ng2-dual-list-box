@@ -1,9 +1,9 @@
 {
-  "name": "ng2-dual-list-box",
-  "version": "1.2.1",
+  "name": "@tenaska/ng2-dual-list-box",
+  "version": "1.2.16",
   "repository": {
     "type": "git",
-    "url": "https://github.com/matsura/ng2-dual-list-box"
+    "url": "https://github.com/tenaska/ng2-dual-list-box"
   },
   "author": {
     "name": "Eldar Granulo",
