@@ -1,9 +1,8 @@
 import { Component, Input, Output, EventEmitter, OnInit, forwardRef } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
-import 'rxjs/add/operator/debounceTime';
-import 'rxjs/add/operator/distinctUntilChanged';
-import 'rxjs/add/operator/map';
-import 'rxjs/operators/find';
+
+import { debounceTime as observableDebounceTime, distinctUntilChanged } from 'rxjs/operators';
+
 const intersectionwith = require('lodash.intersectionwith');
 const differenceWith = require('lodash.differencewith');
 
@@ -117,13 +116,17 @@ export class DualListBoxComponent implements OnInit, ControlValueAccessor {
             .subscribe((items: Array<{}>) => this.onSelectedItemsSelected.emit(items));
         this.availableSearchInputControl
             .valueChanges
-            .debounceTime(this.debounceTime)
-            .distinctUntilChanged()
+            .pipe(
+              observableDebounceTime(this.debounceTime),
+              distinctUntilChanged()
+            )
             .subscribe((search: string) => this.searchTermAvailable = search);
         this.selectedSearchInputControl
             .valueChanges
-            .debounceTime(this.debounceTime)
-            .distinctUntilChanged()
+            .pipe(
+              observableDebounceTime(this.debounceTime),
+              distinctUntilChanged()
+            )
             .subscribe((search: string) => this.searchTermSelected = search);
     }
 

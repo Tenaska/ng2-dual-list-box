@@ -108,21 +108,13 @@ $ npm run lint
 
 ## Deployment
 
-An overkill way to package this up is:
-
 ```bash
 $ npm run build
-$ gulp copy:source
-$ gulp inline-resources
-$ gulp ngc
-$ gulp rollup:fesm
-$ gulp rollup:umd
-$ gulp copy:build
+$ npm run refresh-vsts-token
+$ cp .npmrc dist/.npmrc
 $ cd dist/
 $ npm publish
 ```
-
-Someone please tell me that all of these are not required. However, `npm run build` is never sufficient.
 
 ## License
 
